@@ -6,7 +6,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -52,6 +51,9 @@ class MainActivity : ComponentActivity() {
         }
     )
 
+    // Variável global para pessoaEditando
+    private var pessoaEditando by mutableStateOf<Pessoa?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -69,7 +71,14 @@ class MainActivity : ComponentActivity() {
                                 viewModel,
                                 navController
                             )
-                        } // Adicionando o navController aqui
+                        }
+                        composable("edicao") { // Adicione esta linha para a tela de edição
+                            EdicaoScreen(
+                                viewModel,
+                                pessoaEditando,
+                                onNavigateBack = { navController.popBackStack() }
+                            )
+                        }
                     }
                 }
             }
@@ -110,7 +119,6 @@ class MainActivity : ComponentActivity() {
     fun CadastroScreen(viewModel: PessoaViewModel) {
         var nome by remember { mutableStateOf("") }
         var telefone by remember { mutableStateOf("") }
-        var pessoaEditando by remember { mutableStateOf<Pessoa?>(null) }
 
         Column(
             modifier = Modifier
@@ -152,11 +160,7 @@ class MainActivity : ComponentActivity() {
                 Spacer(modifier = Modifier.height(16.dp))
                 Button(
                     onClick = {
-                        val pessoa =
-                            pessoaEditando?.copy(nome = nome, telefone = telefone) ?: Pessoa(
-                                nome,
-                                telefone
-                            )
+                        val pessoa = Pessoa(nome, telefone)
                         viewModel.upsertPessoa(pessoa)
                         nome = ""
                         telefone = ""
@@ -164,7 +168,78 @@ class MainActivity : ComponentActivity() {
                     },
                     modifier = Modifier.align(Alignment.CenterHorizontally)
                 ) {
-                    Text(text = if (pessoaEditando == null) "Cadastrar" else "Atualizar")
+                    Text(text = "Cadastrar")
+                }
+            }
+        }
+    }
+
+    @Composable
+    fun EdicaoScreen(
+        viewModel: PessoaViewModel,
+        pessoaEditando: Pessoa?,
+        onNavigateBack: () -> Unit
+    ) {
+        var nome by remember { mutableStateOf(pessoaEditando?.nome ?: "") }
+        var telefone by remember { mutableStateOf(pessoaEditando?.telefone ?: "") }
+
+        Column(
+            modifier = Modifier
+                .background(Color.Black)
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "Edição de Pessoa",
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight.Bold,
+                fontSize = 30.sp,
+                color = Color.White,
+                modifier = Modifier
+                    .padding(20.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                TextField(
+                    value = nome,
+                    onValueChange = { nome = it },
+                    label = { Text(text = "Nome:") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                TextField(
+                    value = telefone,
+                    onValueChange = { telefone = it },
+                    label = { Text(text = "Telefone:") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Button(
+                        onClick = {
+                            val pessoa = pessoaEditando?.copy(nome = nome, telefone = telefone) ?: Pessoa(nome, telefone)
+                            viewModel.upsertPessoa(pessoa)
+                            onNavigateBack()
+                        },
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text(text = "Salvar")
+                    }
+                    Button(
+                        onClick = onNavigateBack
+                    ) {
+                        Text(text = "Cancelar")
+                    }
                 }
             }
         }
@@ -173,9 +248,6 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun VisualizacaoScreen(viewModel: PessoaViewModel, navController: NavHostController) {
         var pessoaList by remember { mutableStateOf(listOf<Pessoa>()) }
-        var nome by remember { mutableStateOf("") }
-        var telefone by remember { mutableStateOf("") }
-        var pessoaEditando by remember { mutableStateOf<Pessoa?>(null) }
 
         viewModel.getPessoa().observeForever {
             pessoaList = it
@@ -226,10 +298,8 @@ class MainActivity : ComponentActivity() {
                             Text(text = pessoa.telefone, color = Color.White)
                             IconButton(
                                 onClick = {
-                                    nome = pessoa.nome
-                                    telefone = pessoa.telefone
                                     pessoaEditando = pessoa
-                                    navController.navigate("cadastro")
+                                    navController.navigate("edicao")
                                 }
                             ) {
                                 Icon(
