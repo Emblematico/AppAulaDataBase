@@ -5,28 +5,13 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,7 +56,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             AppAulaDataBaseTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -87,8 +71,7 @@ class MainActivity : ComponentActivity() {
 fun App(viewModel: PessoaViewModel, mainActivity: MainActivity) {
     var nome by remember { mutableStateOf("") }
     var telefone by remember { mutableStateOf("") }
-
-    val pessoa = Pessoa(nome, telefone)
+    var pessoaEditando by remember { mutableStateOf<Pessoa?>(null) }
 
     var pessoaList by remember { mutableStateOf(listOf<Pessoa>()) }
 
@@ -135,13 +118,15 @@ fun App(viewModel: PessoaViewModel, mainActivity: MainActivity) {
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = {
+                    val pessoa = pessoaEditando?.copy(nome = nome, telefone = telefone) ?: Pessoa(nome, telefone)
                     viewModel.upsertPessoa(pessoa)
                     nome = ""
                     telefone = ""
+                    pessoaEditando = null
                 },
                 modifier = Modifier.align(Alignment.CenterHorizontally)
             ) {
-                Text(text = "Cadastrar")
+                Text(text = if (pessoaEditando == null) "Cadastrar" else "Atualizar")
             }
         }
 
@@ -172,7 +157,9 @@ fun App(viewModel: PessoaViewModel, mainActivity: MainActivity) {
                         Text(text = pessoa.telefone)
                         IconButton(
                             onClick = {
-                                // Lógica para edição aqui
+                                nome = pessoa.nome
+                                telefone = pessoa.telefone
+                                pessoaEditando = pessoa
                             }
                         ) {
                             Icon(Icons.Default.Edit, contentDescription = "Editar")
