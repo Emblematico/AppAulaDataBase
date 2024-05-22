@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.items
@@ -15,6 +16,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -85,32 +88,41 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-
     @Composable
     fun MenuScreen(navController: NavHostController) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(Color.Black)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = "Menu",
-                fontFamily = FontFamily.SansSerif,
-                fontWeight = FontWeight.Bold,
-                fontSize = 30.sp,
-                color = Color.White,
-                modifier = Modifier.padding(20.dp)
+            Image(
+                painter = painterResource(id = R.drawable.fundo),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
-            Spacer(modifier = Modifier.height(20.dp))
-            Button(onClick = { navController.navigate("cadastro") }) {
-                Text(text = "Cadastrar Pessoa")
-            }
-            Spacer(modifier = Modifier.height(20.dp))
-            Button(onClick = { navController.navigate("visualizacao") }) {
-                Text(text = "Visualizar Pessoas")
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = "Menu",
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 30.sp,
+                    color = Color.White,
+                    modifier = Modifier.padding(20.dp)
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                Button(onClick = { navController.navigate("cadastro") }) {
+                    Text(text = "Cadastrar Pessoa")
+                }
+                Spacer(modifier = Modifier.height(20.dp))
+                Button(onClick = { navController.navigate("visualizacao") }) {
+                    Text(text = "Visualizar Pessoas")
+                }
             }
         }
     }
@@ -120,55 +132,66 @@ class MainActivity : ComponentActivity() {
         var nome by remember { mutableStateOf("") }
         var telefone by remember { mutableStateOf("") }
 
-        Column(
-            modifier = Modifier
-                .background(Color.Black)
-                .fillMaxSize()
-                .padding(16.dp)
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = "Cadastro de Pessoa",
-                fontFamily = FontFamily.SansSerif,
-                fontWeight = FontWeight.Bold,
-                fontSize = 30.sp,
-                color = Color.White,
-                modifier = Modifier
-                    .padding(20.dp)
-                    .align(Alignment.CenterHorizontally)
+            Image(
+                painter = painterResource(id = R.drawable.fundo),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
-
-            Spacer(modifier = Modifier.height(20.dp))
 
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterHorizontally)
+                    .background(Color.Black.copy(alpha = 0.7f))
+                    .fillMaxSize()
+                    .padding(16.dp)
             ) {
-                TextField(
-                    value = nome,
-                    onValueChange = { nome = it },
-                    label = { Text(text = "Nome:") },
-                    modifier = Modifier.fillMaxWidth()
+                Text(
+                    text = "Cadastro de Pessoa",
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 30.sp,
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .align(Alignment.CenterHorizontally)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = telefone,
-                    onValueChange = { telefone = it },
-                    label = { Text(text = "Telefone:") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    onClick = {
-                        val pessoa = Pessoa(nome, telefone)
-                        viewModel.upsertPessoa(pessoa)
-                        nome = ""
-                        telefone = ""
-                        pessoaEditando = null
-                    },
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
                 ) {
-                    Text(text = "Cadastrar")
+                    TextField(
+                        value = nome,
+                        onValueChange = { nome = it },
+                        label = { Text(text = "Nome:") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextField(
+                        value = telefone,
+                        onValueChange = { telefone = it },
+                        label = { Text(text = "Telefone:") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Button(
+                        onClick = {
+                            val pessoa = Pessoa(nome, telefone)
+                            viewModel.upsertPessoa(pessoa)
+                            nome = ""
+                            telefone = ""
+                            pessoaEditando = null
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(text = "Cadastrar")
+                    }
                 }
             }
         }
@@ -183,62 +206,73 @@ class MainActivity : ComponentActivity() {
         var nome by remember { mutableStateOf(pessoaEditando?.nome ?: "") }
         var telefone by remember { mutableStateOf(pessoaEditando?.telefone ?: "") }
 
-        Column(
-            modifier = Modifier
-                .background(Color.Black)
-                .fillMaxSize()
-                .padding(16.dp)
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = "Edição de Pessoa",
-                fontFamily = FontFamily.SansSerif,
-                fontWeight = FontWeight.Bold,
-                fontSize = 30.sp,
-                color = Color.White,
-                modifier = Modifier
-                    .padding(20.dp)
-                    .align(Alignment.CenterHorizontally)
+            Image(
+                painter = painterResource(id = R.drawable.fundo),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
-
-            Spacer(modifier = Modifier.height(20.dp))
 
             Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.CenterHorizontally)
+                    .background(Color.Black.copy(alpha = 0.7f))
+                    .fillMaxSize()
+                    .padding(16.dp)
             ) {
-                TextField(
-                    value = nome,
-                    onValueChange = { nome = it },
-                    label = { Text(text = "Nome:") },
-                    modifier = Modifier.fillMaxWidth()
+                Text(
+                    text = "Edição de Pessoa",
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 30.sp,
+                    color = Color.White,
+                    modifier = Modifier
+                        .padding(20.dp)
+                        .align(Alignment.CenterHorizontally)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
-                TextField(
-                    value = telefone,
-                    onValueChange = { telefone = it },
-                    label = { Text(text = "Telefone:") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.CenterHorizontally)
                 ) {
-                    Button(
-                        onClick = {
-                            val pessoa = pessoaEditando?.copy(nome = nome, telefone = telefone) ?: Pessoa(nome, telefone)
-                            viewModel.upsertPessoa(pessoa)
-                            onNavigateBack()
-                        },
-                        modifier = Modifier.padding(end = 8.dp)
+                    TextField(
+                        value = nome,
+                        onValueChange = { nome = it },
+                        label = { Text(text = "Nome:") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    TextField(
+                        value = telefone,
+                        onValueChange = { telefone = it },
+                        label = { Text(text = "Telefone:") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
                     ) {
-                        Text(text = "Salvar")
-                    }
-                    Button(
-                        onClick = onNavigateBack
-                    ) {
-                        Text(text = "Cancelar")
+                        Button(
+                            onClick = {
+                                val pessoa = pessoaEditando?.copy(nome = nome, telefone = telefone) ?: Pessoa(nome, telefone)
+                                viewModel.upsertPessoa(pessoa)
+                                onNavigateBack()
+                            },
+                            modifier = Modifier.padding(end = 8.dp)
+                        ) {
+                            Text(text = "Salvar")
+                        }
+                        Button(
+                            onClick = onNavigateBack
+                        ) {
+                            Text(text = "Cancelar")
+                        }
                     }
                 }
             }
@@ -253,71 +287,82 @@ class MainActivity : ComponentActivity() {
             pessoaList = it
         }
 
-        Column(
-            modifier = Modifier
-                .background(Color.Black)
-                .fillMaxSize()
-                .padding(16.dp)
+        Box(
+            modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = "Visualização de Pessoas",
-                fontFamily = FontFamily.SansSerif,
-                fontWeight = FontWeight.Bold,
-                fontSize = 30.sp,
-                color = Color.White,
-                modifier = Modifier
-                    .padding(20.dp)
-                    .align(Alignment.CenterHorizontally)
+            Image(
+                painter = painterResource(id = R.drawable.fundo),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            if (pessoaList.isNotEmpty()) {
-                Column(
+            Column(
+                modifier = Modifier
+                    .background(Color.Black.copy(alpha = 0.7f))
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Visualização de Pessoas",
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 30.sp,
+                    color = Color.White,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 20.dp),
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(text = "Nome", color = Color.White)
-                        Text(text = "Telefone", color = Color.White)
-                        Text(text = "Editar", color = Color.White)
-                        Text(text = "Apagar", color = Color.White)
-                    }
+                        .padding(20.dp)
+                        .align(Alignment.CenterHorizontally)
+                )
 
-                    pessoaList.forEach { pessoa ->
+                Spacer(modifier = Modifier.height(20.dp))
+
+                if (pessoaList.isNotEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 20.dp),
+                    ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(text = pessoa.nome, color = Color.White)
-                            Text(text = pessoa.telefone, color = Color.White)
-                            IconButton(
-                                onClick = {
-                                    pessoaEditando = pessoa
-                                    navController.navigate("edicao")
-                                }
+                            Text(text = "Nome", color = Color.White)
+                            Text(text = "Telefone", color = Color.White)
+                            Text(text = "Editar", color = Color.White)
+                            Text(text = "Apagar", color = Color.White)
+                        }
+
+                        pessoaList.forEach { pessoa ->
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Icon(
-                                    Icons.Default.Edit,
-                                    contentDescription = "Editar",
-                                    tint = Color.White
-                                )
-                            }
-                            IconButton(
-                                onClick = {
-                                    viewModel.deletePessoa(pessoa)
+                                Text(text = pessoa.nome, color = Color.White)
+                                Text(text = pessoa.telefone, color = Color.White)
+                                IconButton(
+                                    onClick = {
+                                        pessoaEditando = pessoa
+                                        navController.navigate("edicao")
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Default.Edit,
+                                        contentDescription = "Editar",
+                                        tint = Color.White
+                                    )
                                 }
-                            ) {
-                                Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = "Apagar",
-                                    tint = Color.White
-                                )
+                                IconButton(
+                                    onClick = {
+                                        viewModel.deletePessoa(pessoa)
+                                    }
+                                ) {
+                                    Icon(
+                                        Icons.Default.Delete,
+                                        contentDescription = "Apagar",
+                                        tint = Color.White
+                                    )
+                                }
                             }
                         }
                     }
